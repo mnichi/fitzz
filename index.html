@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muscle Progress Tracker & Abs Hub</title>
+  
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS (xlsx) for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #09090b;
+      --bg-card: rgba(24, 24, 27, 0.75);
+      --bg-card-border: rgba(255, 255, 255, 0.08);
+      --bg-hover: rgba(39, 39, 42, 0.8);
+      --accent: #22c55e;
+      --accent-glow: rgba(34, 197, 94, 0.25);
+      --accent-dark: #16a34a;
+      
+      --ab-accent: #38bdf8;
+      --ab-glow: rgba(56, 189, 248, 0.25);
+      
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      
+      --status-completed: #22c55e;
+      --status-missed: #ef4444;
+      --status-rest: #6b7280;
+
+      --cal-past-bg: rgba(245, 158, 11, 0.08);
+      --cal-past-border: rgba(245, 158, 11, 0.25);
+      --cal-past-text: #fef3c7;
+      
+      --cal-today-bg: rgba(34, 197, 94, 0.18);
+      --cal-today-border: #22c55e;
+      --cal-today-glow: rgba(34, 197, 94, 0.4);
+
+      --sidebar-width: 260px;
+      --glass-blur: blur(16px);
+      --radius-lg: 14px;
+      --radius-md: 8px;
+      --radius-sm: 6px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(34, 197, 94, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.04) 0%, transparent 40%);
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: var(--transition);
+      margin-bottom: 14px;
+    }
+
+    #sidebar {
+      width: var(--sidebar-width);
+      background: rgba(18, 18, 20, 0.95);
+      backdrop-filter: var(--glass-blur);
+      border-right: 1px solid var(--bg-card-border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    #main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width));
+      transition: var(--transition);
+    }
+
+    .sidebar-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--bg-card-border);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .sidebar-header:hover { background: var(--bg-hover); }
+    .sidebar-header i { font-size: 1.6rem; color: var(--accent); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+    .sidebar-header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      list-style: none;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-item button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+    }
+    .nav-item button:hover { color: var(--text-main); background: var(--bg-hover); }
+    .nav-item.active button {
+      color: var(--text-main);
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      font-weight: 600;
+    }
+    .nav-item.active button i { color: var(--accent); }
+
+    header {
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--bg-card-border);
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: var(--glass-blur);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .header-user h2 { font-size: 1.2rem; font-weight: 700; }
+    .header-user p { font-size: 0.75rem; color: var(--text-muted); }
+
+    .info-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-badge i { color: var(--accent); }
+
+    .mobile-toggle { display: none; background: none; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; }
+
+    footer {
+      margin-top: auto;
+      padding: 10px 24px;
+      text-align: center;
+      border-top: 1px solid var(--bg-card-border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .view-section { display: none; padding: 14px 24px; animation: fadeIn 0.3s ease-out; }
+    .view-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      font-size: 0.75rem;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: var(--accent-dark); box-shadow: 0 0 12px var(--accent-glow); }
+    .btn-ab { background: var(--ab-accent); color: #000; }
+    .btn-ab:hover { background: #0ea5e9; box-shadow: 0 0 12px var(--ab-glow); }
+    .btn-secondary { background: var(--bg-hover); color: var(--text-main); border: 1px solid var(--bg-card-border); }
+    .btn-secondary:hover { background: #3f3f46; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: #ef4444; color: #fff; }
+
+    .input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    .input-group label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .input-control, select, textarea {
+      width: 100%;
+      padding: 5px 8px;
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .input-control:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .metric-card { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 0; }
+    .metric-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-md);
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-size: 1.1rem;
+    }
+    .metric-icon.ab-icon {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--ab-accent);
+    }
+    .metric-data h3 { font-size: 1.15rem; font-weight: 700; }
+    .metric-data p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .split-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
+    .split-day-item { background: rgba(9, 9, 11, 0.5); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 6px; text-align: center; }
+    .split-day-item.today { border-color: var(--accent); background: rgba(34, 197, 94, 0.08); }
+    .split-day-item h4 { font-size: 0.7rem; color: var(--text-muted); }
+    .split-day-item p { font-size: 0.7rem; font-weight: 600; margin-top: 2px; color: var(--text-main); }
+
+    /* Calendar */
+    .calendar-external-controls { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+    .calendar-container { padding: 10px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .calendar-day-head { text-align: center; font-weight: 600; font-size: 0.65rem; color: var(--text-muted); padding: 2px; }
+    .calendar-day {
+      min-height: 40px; max-height: 46px;
+      background: rgba(18, 18, 20, 0.6);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      cursor: pointer;
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: var(--transition);
+    }
+    .calendar-day:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+    .calendar-day.empty { background: transparent; border: none; cursor: default; }
+    .calendar-day.past-date { background: var(--cal-past-bg); border: 1px solid var(--cal-past-border); }
+    .calendar-day.past-date .day-num { color: var(--cal-past-text); }
+    .calendar-day.today-highlight { background: var(--cal-today-bg); border: 1.5px solid var(--cal-today-border); box-shadow: 0 0 8px var(--cal-today-glow); }
+    .calendar-day.today-highlight .day-num { color: #22c55e; font-weight: 800; }
+    .day-num { font-weight: 600; font-size: 0.7rem; }
+    .status-indicator {
+      align-self: flex-end;
+      font-size: 0.5rem;
+      font-weight: 700;
+      padding: 1px 3px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .status-completed { background: rgba(34, 197, 94, 0.2); color: var(--status-completed); border: 1px solid var(--status-completed); }
+    .status-missed { background: rgba(239, 68, 68, 0.2); color: var(--status-missed); border: 1px solid var(--status-missed); }
+    .status-rest { background: rgba(107, 114, 128, 0.2); color: var(--status-rest); border: 1px solid var(--status-rest); }
+
+    /* Tables */
+    .exercise-table-container { overflow-x: auto; margin-top: 10px; }
+    .exercise-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .exercise-table th, .exercise-table td { padding: 8px 10px; border-bottom: 1px solid var(--bg-card-border); font-size: 0.75rem; white-space: nowrap; }
+    .exercise-table th { color: var(--text-muted); font-weight: 600; background: rgba(9, 9, 11, 0.4); }
+
+    /* Modal Dialogs */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: var(--glass-blur);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content { width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 8px; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
+
+    /* Horizontal Exercise Grid */
+    .exercise-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .exercise-block {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .exercise-block.calisthenics-block {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.03);
+    }
+    .exercise-block-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .exercise-block-header select { flex: 1; font-weight: 600; color: var(--accent); padding: 3px; font-size: 0.7rem; }
+    .exercise-block.calisthenics-block .exercise-block-header select { color: var(--ab-accent); }
+    .sets-container { display: flex; flex-direction: column; gap: 3px; }
+    .set-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 1fr 22px;
+      gap: 4px;
+      align-items: center;
+      background: rgba(24, 24, 27, 0.5);
+      padding: 2px 4px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .set-row input { padding: 2px 4px; font-size: 0.7rem; text-align: center; }
+    .set-label { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); }
+
+    .exercise-section-header {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 10px 0 6px 0;
+      border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+      padding-bottom: 3px;
+    }
+    .exercise-section-header.calisthenics-header {
+      color: var(--ab-accent);
+      border-bottom-color: rgba(56, 189, 248, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      #pr-grid-container {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 902px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.active { transform: translateX(0); }
+      #main-content { margin-left: 0; width: 100%; }
+      .mobile-toggle { display: block; }
+      .exercise-grid-container { grid-template-columns: 1fr; }
+      .section-title { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar">
+    <a href="#" class="sidebar-header" onclick="location.reload(); return false;">
+      <i class="fa-solid fa-dumbbell"></i>
+      <h1>Muscle Tracker</h1>
+    </a>
+    <ul class="nav-links">
+      <li class="nav-item active"><button onclick="switchView('dashboard')"><i class="fa-solid fa-chart-line"></i> Dashboard</button></li>
+      <li class="nav-item"><button onclick="switchView('calendar')"><i class="fa-solid fa-calendar-days"></i> Calendar</button></li>
+      <li class="nav-item"><button onclick="switchView('workout-log')"><i class="fa-solid fa-clipboard-list"></i> Workout Log</button></li>
+      <li class="nav-item"><button onclick="switchView('personal-records')"><i class="fa-solid fa-trophy"></i> Personal Records</button></li>
+      <li class="nav-item"><button onclick="switchView('body-measurements')"><i class="fa-solid fa-ruler-combined"></i> Monthly Measurements</button></li>
+      <li class="nav-item"><button onclick="switchView('statistics')"><i class="fa-solid fa-chart-pie"></i> Statistics & Charts</button></li>
+      <li class="nav-item"><button onclick="switchView('settings')"><i class="fa-solid fa-gear"></i> Settings</button></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div id="main-content">
+    
+    <header>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="header-user">
+          <h2>Welcome Back!</h2>
+          <p id="header-date">Today: --</p>
+        </div>
+      </div>
+      <div class="header-info">
+        <div class="info-badge">
+          <i class="fa-solid fa-fire"></i>
+          <span>Today's Split: <strong id="header-split">Chest + Tricep</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view-section active">
+      <div class="section-title">
+        <span>Dashboard</span>
+        <button class="btn btn-primary" onclick="openWorkoutModal()"><i class="fa-solid fa-plus"></i> Log Today's Workout</button>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="glass-card metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-dumbbell"></i></div>
+          <div class="metric-data"><h3 id="dash-total-workouts">0</h3><p>Total Workouts Logged</p></div>
+        </div>
+        <div class="glass-card metric-card">
+          <div class="metric-icon ab-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="metric-data"><h3 id="dash-ab-sessions">0</h3><p>Ab Tracker Sessions</p></div>
+        </div>
+        <div class="glass-card metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-weight-scale"></i></div>
+          <div class="metric-data"><h3 id="dash-bodyweight">-- kg</h3><p>Latest Body Weight</p></div>
+        </div>
+      </div>
+
+      <!-- DAILY WARMUP CHECKLIST (5 COLUMNS) -->
+      <div class="glass-card">
+        <h3><i class="fa-solid fa-fire-flame-curved" style="color: var(--accent);"></i> Daily Warmup Checklist</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Complete your warmup routine before training sessions.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 0.72rem;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Head turn (5x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Wrist turn (5x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Waist turn (5x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Elbow turn (10x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Front arm swing (10x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Cross arm swing (10x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Cross body toe (10x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Arm Circles (10x)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" style="accent-color: var(--accent);"> Cat-Cow Stretch (10x)
+          </label>
+        </div>
+      </div>
+
+      <!-- WEEKLY WORKOUT SCHEDULE -->
+      <div class="glass-card">
+        <h3><i class="fa-solid fa-calendar-week" style="color: var(--accent);"></i> Weekly Workout Schedule</h3>
+        <div class="split-list" id="split-container"></div>
+      </div>
+    </section>
+
+    <!-- 2. CALENDAR VIEW -->
+    <section id="view-calendar" class="view-section">
+      <div class="section-title">
+        <span>Workout Calendar</span>
+        <div class="calendar-external-controls">
+          <div class="input-group" style="margin:0; width: 100px;">
+            <select id="cal-year-select" class="input-control" onchange="renderCalendar()">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0; width: 130px;">
+            <select id="cal-month-select" class="input-control" onchange="renderCalendar()">
+              <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+              <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+              <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+              <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card calendar-container">
+        <div class="calendar-grid">
+          <div class="calendar-day-head">Sun</div><div class="calendar-day-head">Mon</div><div class="calendar-day-head">Tue</div>
+          <div class="calendar-day-head">Wed</div><div class="calendar-day-head">Thu</div><div class="calendar-day-head">Fri</div><div class="calendar-day-head">Sat</div>
+        </div>
+        <div class="calendar-grid" id="calendar-days-container" style="margin-top: 4px;"></div>
+      </div>
+    </section>
+
+    <!-- 3. WORKOUT LOG VIEW -->
+    <section id="view-workout-log" class="view-section">
+      <div class="section-title">
+        <span>Workout Log History</span>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <div class="input-group" style="margin:0; width: 100px;">
+            <select id="log-filter-year" class="input-control" onchange="renderWorkoutLogTable()">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0; width: 130px;">
+            <select id="log-filter-month" class="input-control" onchange="renderWorkoutLogTable()">
+              <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+              <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+              <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+              <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+            </select>
+          </div>
+          <button class="btn btn-ab" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Download Excel</button>
+          <button class="btn btn-primary" onclick="openWorkoutModal()"><i class="fa-solid fa-plus"></i> New Entry</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="exercise-table-container">
+          <table class="exercise-table">
+            <thead>
+              <tr>
+                <th>Count</th>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Exercises Logged</th>
+                <th>Weight</th>
+                <th>Muscle Group</th>
+              </tr>
+            </thead>
+            <tbody id="workout-log-table-body">
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No workout logs found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW SCREEN: PERSONAL RECORDS (2-Column Muscle Group Grid) -->
+    <section id="view-personal-records" class="view-section">
+      <div class="section-title"><span>Personal Records (PRs)</span></div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Your all-time maximum weight and best set lifted for each exercise grouped by muscle group.</p>
+      
+      <!-- 2-Column Grid Container -->
+      <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+        <!-- Dynamically injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- NEW SCREEN: BODY MEASUREMENT TRACKER -->
+    <section id="view-body-measurements" class="view-section">
+      <div class="section-title">
+        <span>Monthly Body Measurements Tracker</span>
+        <button class="btn btn-primary" onclick="openMeasurementModal()"><i class="fa-solid fa-plus"></i> Log Monthly Entry</button>
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Track your physique changes measured at the end of every month.</p>
+      
+      <div class="glass-card">
+        <div class="exercise-table-container">
+          <table class="exercise-table">
+            <thead>
+              <tr>
+                <th>Date / Month</th>
+                <th>Body Weight (kg)</th>
+                <th>Chest</th>
+                <th>Waist</th>
+                <th>Hips</th>
+                <th>Biceps (L/R)</th>
+                <th>Thighs (L/R)</th>
+                <th>Calves (L/R)</th>
+              </tr>
+            </thead>
+            <tbody id="measurement-table-body">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No monthly measurements recorded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. STATISTICS & CHARTS VIEW -->
+    <section id="view-statistics" class="view-section">
+      <div class="section-title"><span>Statistics & Progress Analytics</span></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">
+        <div class="glass-card">
+          <h3>Body Weight Trend (kg)</h3>
+          <div style="height: 260px; margin-top: 10px; position: relative;">
+            <canvas id="chart-weight"></canvas>
+          </div>
+        </div>
+        <div class="glass-card">
+          <h3>Ab Progression (Max Weight)</h3>
+          <div style="height: 260px; margin-top: 10px; position: relative;">
+            <canvas id="chart-abs"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SETTINGS VIEW -->
+    <section id="view-settings" class="view-section">
+      <div class="section-title"><span>Settings & Data Management</span></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+        <div class="glass-card">
+          <h3><i class="fa-solid fa-file-export" style="color: var(--accent);"></i> Export Data</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin: 6px 0 10px 0;">Backup all workout records, measurements, and entries as a JSON file.</p>
+          <button class="btn btn-secondary" onclick="exportData()"><i class="fa-solid fa-download"></i> Download Data</button>
+        </div>
+
+        <div class="glass-card">
+          <h3><i class="fa-solid fa-file-import" style="color: var(--accent);"></i> Import Data</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin: 6px 0 10px 0;">Restore records from a previously exported backup file.</p>
+          <input type="file" id="import-file" style="display: none;" onchange="importData(event)">
+          <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()"><i class="fa-solid fa-upload"></i> Choose File</button>
+        </div>
+
+        <div class="glass-card" style="border-color: rgba(239, 68, 68, 0.3);">
+          <h3 style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin: 6px 0 10px 0;">Permanently clear all logs, settings, and entries from browser storage.</p>
+          <button class="btn btn-danger" onclick="clearAllData()"><i class="fa-solid fa-trash"></i> Reset All Application Data</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>Made with ❤️ by Manjesh M</footer>
+  </div>
+
+  <!-- WORKOUT MODAL -->
+  <div class="modal-overlay" id="workout-modal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3>Log Workout</h3>
+        <button class="modal-close" onclick="closeWorkoutModal()">&times;</button>
+      </div>
+      
+      <form id="workout-form" onsubmit="saveWorkoutLog(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="log-date" class="input-control" required onchange="onDateChanged()">
+          </div>
+          <div class="input-group">
+            <label>Body Weight (kg)</label>
+            <input type="number" step="0.1" id="log-weight-input" class="input-control" placeholder="e.g. 70.5">
+          </div>
+          <div class="input-group">
+            <label>Status</label>
+            <select id="log-status" class="input-control" onchange="toggleModalFieldsByStatus()">
+              <option value="Completed">Completed</option>
+              <option value="Missed">Missed Workout</option>
+              <option value="Rest">Rest Day</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="modal-workout-details">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+            <div class="input-group">
+              <label>Target Split</label>
+              <select id="log-split-select" class="input-control" onchange="onSplitSelectChange()">
+                <option value="Chest + Tricep">Chest + Tricep</option>
+                <option value="Back + Bicep">Back + Bicep</option>
+                <option value="Shoulder + Leg">Shoulder + Leg</option>
+                <option value="Rest Day">Rest Day</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Workout Duration (Minutes)</label>
+              <input type="number" id="log-duration" class="input-control" value="60">
+            </div>
+          </div>
+
+          <div style="margin-top: 6px;">
+            <h4 style="border-bottom: 1px solid var(--bg-card-border); padding-bottom: 3px; font-size: 0.85rem;">
+              <i class="fa-solid fa-list-check" style="color: var(--accent);"></i> Exercise Sets (Side-By-Side Layout)
+            </h4>
+
+            <div class="exercise-section-header" id="header-muscle-1">Muscle Group 1</div>
+            <div class="exercise-grid-container" id="container-muscle-1"></div>
+
+            <div class="exercise-section-header" id="header-muscle-2">Muscle Group 2</div>
+            <div class="exercise-grid-container" id="container-muscle-2"></div>
+
+            <!-- CALISTHENICS 4 COLUMNS SECTION -->
+            <div class="exercise-section-header calisthenics-header"><i class="fa-solid fa-bolt"></i> Calisthenics & Core (Pushups, Pullups, Squats, Abs)</div>
+            <div class="exercise-grid-container" id="container-calisthenics"></div>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-top: 10px;">
+          <label>Notes / Reflections</label>
+          <textarea id="log-notes" rows="2" placeholder="How did the session feel? Any personal records?"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeWorkoutModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Workout Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MONTHLY MEASUREMENT MODAL -->
+  <div class="modal-overlay" id="measurement-modal">
+    <div class="modal-content glass-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Log Monthly Measurements</h3>
+        <button class="modal-close" onclick="closeMeasurementModal()">&times;</button>
+      </div>
+      
+      <form id="measurement-form" onsubmit="saveMeasurementLog(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="input-group">
+            <label>Date (End of Month)</label>
+            <input type="date" id="m-date" class="input-control" required>
+          </div>
+          <div class="input-group">
+            <label>Body Weight (kg)</label>
+            <input type="number" step="0.1" id="m-weight" class="input-control" placeholder="e.g. 70.5" required>
+          </div>
+          <div class="input-group">
+            <label>Chest</label>
+            <input type="number" step="0.1" id="m-chest" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Waist</label>
+            <input type="number" step="0.1" id="m-waist" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Hips</label>
+            <input type="number" step="0.1" id="m-hips" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Left Biceps</label>
+            <input type="number" step="0.1" id="m-left-biceps" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Right Biceps</label>
+            <input type="number" step="0.1" id="m-right-biceps" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Left Thigh</label>
+            <input type="number" step="0.1" id="m-left-thigh" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Right Thigh</label>
+            <input type="number" step="0.1" id="m-right-thigh" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Left Calf</label>
+            <input type="number" step="0.1" id="m-left-calves" class="input-control" placeholder="cm / inches">
+          </div>
+          <div class="input-group">
+            <label>Right Calf</label>
+            <input type="number" step="0.1" id="m-right-calves" class="input-control" placeholder="cm / inches">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button type="button" class="btn btn-secondary" onclick="closeMeasurementModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Measurements</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_SPLITS = { 0: "Rest Day", 1: "Chest + Tricep", 2: "Back + Bicep", 3: "Shoulder + Leg", 4: "Chest + Tricep", 5: "Back + Bicep", 6: "Shoulder + Leg" };
+
+    const EXERCISE_DATABASE = {
+      "Chest": [
+        "Dumbell Chest Press", "Barbell Chest Press", "Smith Machine Chest Press", 
+        "Smith Machine Incline Chest Press", "Dumbell Incline Chest Press", "Barbell Incline Chest Press", 
+        "Pec Fly Machine", "Dumbbell Close Grip Press", "Cable Chest Fly", "Chest Dips", "Smith Machine Decline Chest Press"
+      ],
+      "Triceps": [
+        "Dumbbell Overhead Triceps", "Dumbbell Kickbacks", "Triceps Pushdown (Cable Bar)", 
+        "Triceps Pushdown (Rope)", "Triceps Dips Bench", "Barbell Skull Crusher", "Dumbbell Skull Crusher", 
+        "Overhead Tricep Extension", "Single Arm Dumbbell Tricep Kickback", "Triceps Pushdown (Single Arm)"
+      ],
+      "Back": [
+        "Lat Pulldown", "Behind Neck Lat Pull Down", "Reverse Grip Lat Pulldown", 
+        "Lat Pulldown Close", "Lat Pulldown Medium", "Lat Pulldown Wide", 
+        "Seated Rows", "Barbell Bent-Over Row", "Straight Arm Pulldown", 
+        "One Arm Dumbbell Row", "T-Bar Row", "Stiff Arm Pull Down", "Single Arm Cable Rows"
+      ],
+      "Biceps": [
+        "Barbell Bicep Curl", "Dumbbell Bicep Curl", "Dumbbell Hammer Curl", 
+        "Dumbbell Hammer Preacher Curl", "Machine Preacher Curl", "Barbell Preacher Curl", 
+        "Dumbbell Preacher Curl", "Chin-ups", "Incline Dumbbell Curl", 
+        "Decline Dumbbell Bench Press", "Cable Bicep Curl", "EZ Barbell Curl"
+      ],
+      "Shoulders": [
+        "Arnold Press", "Incline Bench Reverse Fly", "Dumbbell Shoulder Press", 
+        "Barbell Shoulder Press", "Smith Machine Shoulder Press", "Dumbbell Front Raise", 
+        "Barbell Front Raise", "Cable Front Raise", "Rope Front Raise", 
+        "Dumbbell Upright Row", "Barbell Upright Row", "Cable Upright Row", "Rope Upright Row", 
+        "Dumbbell Shrugs", "Bent Over Dumbbell Reverse Fly", "Face Pull", "Poliquin Lateral Raise", 
+        "Dumbbell Rear Delt Fly", "Machine Shoulder Press (Reverse)"
+      ],
+      "Legs": [
+        "Romanian Deadlift (RDL)", "Dumbbell Sumo Squats", "Dumbbell Goblet Squats", 
+        "Leg Extension", "Leg Curl", "Lying Leg Curl", "Walking Lunges", 
+        "Leg Press", "Hack Squat", "Smith Machine Squat", "Smith Machine Calf Raises"
+      ],
+      "Calisthenics": ["PushUps", "PullUps", "Squats", "Abs"]
+    };
+
+    const SPLIT_MAPPING = {
+      "Chest + Tricep": { m1: "Chest", m2: "Triceps" },
+      "Back + Bicep": { m1: "Back", m2: "Biceps" },
+      "Shoulder + Leg": { m1: "Shoulders", m2: "Legs" },
+      "Rest Day": { m1: null, m2: null }
+    };
+
+    const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    let appData = { workouts: [], measurements: [] };
+    let chartWeightInstance = null;
+    let chartAbInstance = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadLocalStorage();
+      setupHeaderInfo();
+      
+      const today = new Date();
+      document.getElementById('cal-year-select').value = today.getFullYear().toString();
+      document.getElementById('cal-month-select').value = today.getMonth().toString();
+      document.getElementById('log-filter-year').value = today.getFullYear().toString();
+      document.getElementById('log-filter-month').value = today.getMonth().toString();
+
+      renderDashboard();
+      renderCalendar();
+      renderWorkoutLogTable();
+      renderPersonalRecords();
+      renderMeasurementTable();
+      initCharts();
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+    function switchView(viewName) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      const targetView = document.getElementById(`view-${viewName}`);
+      if(targetView) targetView.classList.add('active');
+
+      const navBtns = document.querySelectorAll('.nav-item button');
+      navBtns.forEach(btn => {
+        if(btn.getAttribute('onclick').includes(viewName)) {
+          btn.parentElement.classList.add('active');
+        }
+      });
+
+      if(viewName === 'personal-records') renderPersonalRecords();
+      if(viewName === 'body-measurements') renderMeasurementTable();
+
+      if(viewName === 'statistics') {
+        updateCharts();
+        if(chartWeightInstance) chartWeightInstance.resize();
+        if(chartAbInstance) chartAbInstance.resize();
+      }
+    }
+
+    function setupHeaderInfo() {
+      const today = new Date();
+      document.getElementById('header-date').innerText = `Today: ${today.toLocaleDateString()}`;
+      document.getElementById('header-split').innerText = DEFAULT_SPLITS[today.getDay()];
+    }
+
+    function loadLocalStorage() {
+      const stored = localStorage.getItem("muscle_progress_data");
+      if(stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          appData.workouts = parsed.workouts || [];
+          appData.measurements = parsed.measurements || [];
+        } catch(e) {
+          appData = { workouts: [], measurements: [] };
+        }
+      }
+    }
+
+    function saveData() { 
+      localStorage.setItem("muscle_progress_data", JSON.stringify(appData));
+    }
+
+    function renderModalExerciseSlots(splitName, savedExercises = []) {
+      const mapping = SPLIT_MAPPING[splitName] || { m1: "Chest", m2: "Triceps" };
+      const c1 = document.getElementById('container-muscle-1');
+      const c2 = document.getElementById('container-muscle-2');
+      const cCalisthenics = document.getElementById('container-calisthenics');
+      const h1 = document.getElementById('header-muscle-1');
+      const h2 = document.getElementById('header-muscle-2');
+
+      c1.innerHTML = ''; c2.innerHTML = ''; cCalisthenics.innerHTML = '';
+
+      if(!mapping.m1) {
+        h1.innerText = "Rest Day"; h2.innerText = "";
+      } else {
+        h1.innerText = `${mapping.m1} Exercises`;
+        h2.innerText = `${mapping.m2} Exercises`;
+
+        const m1List = EXERCISE_DATABASE[mapping.m1] || [];
+        const m2List = EXERCISE_DATABASE[mapping.m2] || [];
+
+        for(let i = 0; i < 4; i++) {
+          const defaultEx = m1List[i] || "";
+          const saved = savedExercises.find(ex => ex.name === defaultEx) || savedExercises[i] || {};
+          c1.appendChild(createExerciseBlock(m1List, mapping.m1, saved.name || defaultEx, saved.sets || [], false));
+        }
+
+        for(let i = 0; i < 4; i++) {
+          const defaultEx = m2List[i] || "";
+          const saved = savedExercises.find(ex => ex.name === defaultEx) || savedExercises[i + 4] || {};
+          c2.appendChild(createExerciseBlock(m2List, mapping.m2, saved.name || defaultEx, saved.sets || [], false));
+        }
+      }
+
+      // Calisthenics 4 Columns (Pushups, Pullups, Squats, Abs)
+      const calisthenicsItems = ["PushUps", "PullUps", "Squats", "Abs"];
+      calisthenicsItems.forEach(exName => {
+        const savedEx = savedExercises.find(ex => ex.name === exName) || { name: exName, sets: [{reps: 15, weight: 0}, {reps: 15, weight: 0}, {reps: 15, weight: 0}] };
+        cCalisthenics.appendChild(createExerciseBlock([exName], "Calisthenics", exName, savedEx.sets || [], true));
+      });
+    }
+
+    function createExerciseBlock(exerciseOptions, muscleGroup, selectedExName, savedSets = [], isCalisthenics = false) {
+      const block = document.createElement('div');
+      block.className = isCalisthenics ? 'exercise-block calisthenics-block' : 'exercise-block';
+      block.dataset.muscle = muscleGroup;
+
+      const optionsHtml = exerciseOptions.map(ex => 
+        `<option value="${ex}" ${ex === selectedExName ? 'selected' : ''}>${ex}</option>`
+      ).join('');
+
+      block.innerHTML = `
+        <div class="exercise-block-header">
+          <select class="input-control ex-name-select" ${isCalisthenics ? 'disabled' : ''}>
+            ${optionsHtml}
+          </select>
+          <button type="button" class="btn btn-secondary" style="padding: 2px 5px; font-size: 0.65rem;" onclick="addSetRow(this)">
+            <i class="fa-solid fa-plus"></i> Set
+          </button>
+        </div>
+        <div class="sets-container"></div>
+      `;
+
+      const setsContainer = block.querySelector('.sets-container');
+      const initialSets = savedSets.length > 0 ? savedSets : [
+        { reps: 15, weight: 0 },
+        { reps: 15, weight: 0 },
+        { reps: 15, weight: 0 }
+      ];
+
+      initialSets.forEach((s, idx) => {
+        setsContainer.appendChild(createSetRowHtml(idx + 1, s.reps, s.weight));
+      });
+
+      return block;
+    }
+
+    function createSetRowHtml(setNum, reps = 15, weight = 0) {
+      const row = document.createElement('div');
+      row.className = 'set-row';
+      row.innerHTML = `
+        <span class="set-label">S${setNum}</span>
+        <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
+        <input type="number" step="0.5" class="input-control set-weight" placeholder="kg" value="${weight}">
+        <button type="button" class="btn btn-danger" style="padding: 1px 4px; font-size: 0.6rem;" onclick="removeSetRow(this)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      return row;
+    }
+
+    function addSetRow(btnBtn) {
+      const setsContainer = btnBtn.closest('.exercise-block').querySelector('.sets-container');
+      const currentSetCount = setsContainer.children.length;
+      setsContainer.appendChild(createSetRowHtml(currentSetCount + 1, 15, 0));
+    }
+
+    function removeSetRow(btnBtn) {
+      const setsContainer = btnBtn.closest('.sets-container');
+      btnBtn.closest('.set-row').remove();
+      Array.from(setsContainer.children).forEach((row, idx) => {
+        row.querySelector('.set-label').innerText = `S${idx + 1}`;
+      });
+    }
+
+    function saveWorkoutLog(e) {
+      e.preventDefault();
+
+      const date = document.getElementById('log-date').value;
+      const weightInputVal = parseFloat(document.getElementById('log-weight-input').value);
+      const status = document.getElementById('log-status').value;
+      const notes = document.getElementById('log-notes').value;
+
+      let split = null;
+      let duration = 0;
+      let exercises = [];
+
+      if(status === 'Completed') {
+        split = document.getElementById('log-split-select').value;
+        duration = parseInt(document.getElementById('log-duration').value) || 0;
+        
+        const blocks = document.querySelectorAll('.exercise-block');
+        blocks.forEach(block => {
+          const exName = block.querySelector('.ex-name-select').value;
+          const muscleGroup = block.dataset.muscle || 'General';
+          if(exName) {
+            const setRows = block.querySelectorAll('.set-row');
+            const sets = [];
+            setRows.forEach((sr, idx) => {
+              sets.push({
+                setNum: idx + 1,
+                reps: parseInt(sr.querySelector('.set-reps').value) || 0,
+                weight: parseFloat(sr.querySelector('.set-weight').value) || 0
+              });
+            });
+            if(sets.length > 0) exercises.push({ name: exName, muscleGroup: muscleGroup, sets: sets });
+          }
+        });
+      }
+
+      appData.workouts = appData.workouts.filter(w => w.date !== date);
+      appData.workouts.push({ date, status, split, duration, notes, exercises });
+
+      if(!isNaN(weightInputVal)) {
+        let existingM = appData.measurements.find(m => m.date === date);
+        if(existingM) {
+          existingM.weight = weightInputVal;
+        } else {
+          appData.measurements.push({
+            date, weight: weightInputVal, chest: null, waist: null, hips: null,
+            leftBiceps: null, rightBiceps: null, leftThigh: null, rightThigh: null, leftCalves: null, rightCalves: null
+          });
+        }
+      }
+
+      saveData();
+      closeWorkoutModal();
+      renderDashboard();
+      renderCalendar();
+      renderWorkoutLogTable();
+      renderPersonalRecords();
+      renderMeasurementTable();
+      updateCharts();
+    }
+
+    function openWorkoutModal(dateString = null) {
+      const modal = document.getElementById('workout-modal');
+      const dateInput = document.getElementById('log-date');
+      
+      const targetDate = dateString || new Date().toISOString().split('T')[0];
+      dateInput.value = targetDate;
+      
+      const existingMeasurement = appData.measurements.find(m => m.date === targetDate);
+      document.getElementById('log-weight-input').value = existingMeasurement && existingMeasurement.weight ? existingMeasurement.weight : '';
+
+      const dayIdx = new Date(targetDate).getDay();
+      const defaultSplit = DEFAULT_SPLITS[dayIdx];
+
+      const existing = appData.workouts.find(w => w.date === targetDate);
+      if(existing) {
+        document.getElementById('log-status').value = existing.status;
+        document.getElementById('log-split-select').value = existing.split || defaultSplit;
+        document.getElementById('log-duration').value = existing.duration || 60;
+        document.getElementById('log-notes').value = existing.notes || '';
+        renderModalExerciseSlots(existing.split || defaultSplit, existing.exercises || []);
+      } else {
+        document.getElementById('log-status').value = 'Completed';
+        document.getElementById('log-split-select').value = defaultSplit;
+        document.getElementById('log-duration').value = 60;
+        document.getElementById('log-notes').value = '';
+        renderModalExerciseSlots(defaultSplit, []);
+      }
+
+      toggleModalFieldsByStatus();
+      modal.classList.add('active');
+    }
+
+    function closeWorkoutModal() { document.getElementById('workout-modal').classList.remove('active'); }
+
+    function openMeasurementModal() {
+      const modal = document.getElementById('measurement-modal');
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('m-date').value = today;
+      document.getElementById('measurement-form').reset();
+      document.getElementById('m-date').value = today;
+      modal.classList.add('active');
+    }
+
+    function closeMeasurementModal() { document.getElementById('measurement-modal').classList.remove('active'); }
+
+    function saveMeasurementLog(e) {
+      e.preventDefault();
+      const date = document.getElementById('m-date').value;
+      const weight = parseFloat(document.getElementById('m-weight').value) || 0;
+      const chest = parseFloat(document.getElementById('m-chest').value) || null;
+      const waist = parseFloat(document.getElementById('m-waist').value) || null;
+      const hips = parseFloat(document.getElementById('m-hips').value) || null;
+      const leftBiceps = parseFloat(document.getElementById('m-left-biceps').value) || null;
+      const rightBiceps = parseFloat(document.getElementById('m-right-biceps').value) || null;
+      const leftThigh = parseFloat(document.getElementById('m-left-thigh').value) || null;
+      const rightThigh = parseFloat(document.getElementById('m-right-thigh').value) || null;
+      const leftCalves = parseFloat(document.getElementById('m-left-calves').value) || null;
+      const rightCalves = parseFloat(document.getElementById('m-right-calves').value) || null;
+
+      appData.measurements = appData.measurements.filter(m => m.date !== date);
+      appData.measurements.push({
+        date, weight, chest, waist, hips, leftBiceps, rightBiceps, leftThigh, rightThigh, leftCalves, rightCalves
+      });
+
+      saveData();
+      closeMeasurementModal();
+      renderDashboard();
+      renderMeasurementTable();
+      updateCharts();
+    }
+
+    function toggleModalFieldsByStatus() {
+      const status = document.getElementById('log-status').value;
+      document.getElementById('modal-workout-details').style.display = status === 'Completed' ? 'block' : 'none';
+    }
+
+    function onDateChanged() {
+      const dateVal = document.getElementById('log-date').value;
+      if(!dateVal) return;
+      const defaultSplit = DEFAULT_SPLITS[new Date(dateVal).getDay()];
+      document.getElementById('log-split-select').value = defaultSplit;
+      
+      const existingMeasurement = appData.measurements.find(m => m.date === dateVal);
+      document.getElementById('log-weight-input').value = existingMeasurement && existingMeasurement.weight ? existingMeasurement.weight : '';
+      
+      renderModalExerciseSlots(defaultSplit, []);
+    }
+
+    function onSplitSelectChange() {
+      renderModalExerciseSlots(document.getElementById('log-split-select').value, []);
+    }
+
+    function renderWorkoutLogTable() {
+      const tbody = document.getElementById('workout-log-table-body');
+      const year = parseInt(document.getElementById('log-filter-year').value);
+      const month = parseInt(document.getElementById('log-filter-month').value);
+
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      let rowsHtml = '';
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayName = DAY_NAMES[new Date(year, month, day).getDay()];
+        const workout = appData.workouts ? appData.workouts.find(w => w.date === dateStr) : null;
+        const measurement = appData.measurements ? appData.measurements.find(m => m.date === dateStr) : null;
+
+        let weightDisplay = measurement && measurement.weight ? `${measurement.weight.toFixed(1)} kg` : '--';
+        
+        if (workout && workout.exercises && workout.exercises.length > 0) {
+          let exerciseHtml = workout.exercises.map((ex, idx) => {
+            const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+            const isHighlighted = idx >= 8;
+            const nameColor = isHighlighted ? 'color: var(--ab-accent); font-weight: 700;' : '';
+            return `<div style="margin-bottom: 2px;"><span style="${nameColor}">${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)</span></div>`;
+          }).join('');
+
+          let muscleGroupText = workout.split || (workout.status === 'Completed' ? 'General' : workout.status);
+
+          rowsHtml += `
+            <tr style="cursor: pointer;" onclick="openWorkoutModal('${dateStr}')" title="Click to edit/log">
+              <td><strong>#${day}</strong></td>
+              <td>${dayName}</td>
+              <td><span style="color: var(--accent); font-weight: 600;">${dateStr}</span></td>
+              <td>${exerciseHtml}</td>
+              <td>${weightDisplay}</td>
+              <td><span style="font-weight: 600; color: var(--ab-accent);">${muscleGroupText}</span></td>
+            </tr>
+          `;
+        } else {
+          let statusText = workout ? workout.status : 'No Log';
+          rowsHtml += `
+            <tr style="cursor: pointer; opacity: 0.7;" onclick="openWorkoutModal('${dateStr}')" title="Click to edit/log">
+              <td><strong>#${day}</strong></td>
+              <td>${dayName}</td>
+              <td><span style="font-weight: 600;">${dateStr}</span></td>
+              <td style="color: var(--text-muted);"><em>No exercises logged</em></td>
+              <td>${weightDisplay}</td>
+              <td><span style="color: var(--text-muted);">${statusText}</span></td>
+            </tr>
+          `;
+        }
+      }
+
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function renderPersonalRecords() {
+      const container = document.getElementById('pr-grid-container');
+      const prMap = {};
+
+      if(appData.workouts) {
+        appData.workouts.forEach(w => {
+          if(w.exercises) {
+            w.exercises.forEach(ex => {
+              ex.sets.forEach(s => {
+                if(!prMap[ex.name] || s.weight > prMap[ex.name].weight) {
+                  prMap[ex.name] = {
+                    exerciseName: ex.name,
+                    muscleGroup: ex.muscleGroup || 'General',
+                    weight: s.weight,
+                    reps: s.reps,
+                    setNum: s.setNum,
+                    date: w.date
+                  };
+                }
+              });
+            });
+          }
+        });
+      }
+
+      const prs = Object.values(prMap);
+
+      if(prs.length === 0) {
+        container.style.gridTemplateColumns = "1fr";
+        container.innerHTML = `<div class="glass-card" style="text-align: center; color: var(--text-muted); padding: 20px;">No PRs recorded yet. Start logging workouts!</div>`;
+        return;
+      }
+
+      container.style.gridTemplateColumns = "repeat(2, 1fr)";
+
+      const groupedByMuscle = {};
+      prs.forEach(pr => {
+        const group = pr.muscleGroup;
+        if(!groupedByMuscle[group]) groupedByMuscle[group] = [];
+        groupedByMuscle[group].push(pr);
+      });
+
+      const muscleOrder = ["Chest", "Triceps", "Back", "Biceps", "Shoulders", "Legs", "Calisthenics", "General"];
+      let htmlContent = '';
+
+      muscleOrder.forEach(muscle => {
+        const exercisesInGroup = groupedByMuscle[muscle];
+        if(exercisesInGroup && exercisesInGroup.length > 0) {
+          exercisesInGroup.sort((a, b) => b.weight - a.weight);
+
+          htmlContent += `
+            <div class="glass-card" style="margin-bottom: 0;">
+              <h3 style="color: var(--accent); border-bottom: 1px solid var(--bg-card-border); padding-bottom: 6px; margin-bottom: 8px; font-size: 0.95rem;">
+                <i class="fa-solid fa-dumbbell"></i> ${muscle}
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+          `;
+
+          exercisesInGroup.forEach(pr => {
+            htmlContent += `
+              <div style="background: rgba(9,9,11,0.4); border: 1px solid var(--bg-card-border); padding: 6px 8px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.78rem; color: var(--text-main);">${pr.exerciseName}</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">Set ${pr.setNum} (${pr.reps} reps) • ${pr.date}</div>
+                </div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--ab-accent);">
+                  ${pr.weight.toFixed(1)} kg
+                </div>
+              </div>
+            `;
+          });
+
+          htmlContent += `</div></div>`;
+        }
+      });
+
+      container.innerHTML = htmlContent;
+    }
+
+    function renderMeasurementTable() {
+      const tbody = document.getElementById('measurement-table-body');
+      const sorted = appData.measurements ? [...appData.measurements].sort((a,b) => new Date(b.date) - new Date(a.date)) : [];
+
+      if(sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No monthly measurements recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(m => `
+        <tr>
+          <td><strong style="color: var(--accent);">${m.date}</strong></td>
+          <td>${m.weight ? m.weight.toFixed(1) + ' kg' : '--'}</td>
+          <td>${m.chest !== null ? m.chest : '--'}</td>
+          <td>${m.waist !== null ? m.waist : '--'}</td>
+          <td>${m.hips !== null ? m.hips : '--'}</td>
+          <td>${m.leftBiceps !== null || m.rightBiceps !== null ? `${m.leftBiceps ?? '--'} / ${m.rightBiceps ?? '--'}` : '--'}</td>
+          <td>${m.leftThigh !== null || m.rightThigh !== null ? `${m.leftThigh ?? '--'} / ${m.rightThigh ?? '--'}` : '--'}</td>
+          <td>${m.leftCalves !== null || m.rightCalves !== null ? `${m.leftCalves ?? '--'} / ${m.rightCalves ?? '--'}` : '--'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function exportToExcel() {
+      const year = parseInt(document.getElementById('log-filter-year').value);
+      const month = parseInt(document.getElementById('log-filter-month').value);
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      let exportRows = [];
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayName = DAY_NAMES[new Date(year, month, day).getDay()];
+        const workout = appData.workouts ? appData.workouts.find(w => w.date === dateStr) : null;
+        const measurement = appData.measurements ? appData.measurements.find(m => m.date === dateStr) : null;
+
+        let weightVal = measurement ? measurement.weight : '';
+        let muscleGroup = workout ? (workout.split || workout.status) : 'No Log';
+
+        if (workout && workout.exercises && workout.exercises.length > 0) {
+          let allExercisesText = workout.exercises.map((ex, idx) => {
+            const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+            return `${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)`;
+          }).join('\n');
+
+          exportRows.push({
+            "Date": dateStr,
+            "Day": dayName,
+            "Body Weight (kg)": weightVal,
+            "Muscle Group": muscleGroup,
+            "Exercises Logged": allExercisesText,
+            "Notes": workout.notes || ""
+          });
+        } else {
+          exportRows.push({
+            "Date": dateStr,
+            "Day": dayName,
+            "Body Weight (kg)": weightVal,
+            "Muscle Group": muscleGroup,
+            "Exercises Logged": "No exercises logged",
+            "Notes": workout ? workout.notes || "" : ""
+          });
+        }
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(exportRows);
+      
+      if(!worksheet['!rows']) worksheet['!rows'] = [];
+      for (let i = 1; i <= exportRows.length; i++) {
+        worksheet['!rows'][i] = { hpt: 110 };
+      }
+      const range = XLSX.utils.decode_range(worksheet['!ref']);
+      for (let R = range.s.r; R <= range.e.r; ++R) {
+        const cellAddress = XLSX.utils.encode_cell({r: R, c: 4});
+        if (worksheet[cellAddress]) {
+          if (!worksheet[cellAddress].s) worksheet[cellAddress].s = {};
+          worksheet[cellAddress].s.alignment = { wrapText: true, vertical: "top" };
+        }
+      }
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Workout Log");
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      XLSX.writeFile(workbook, `Workout_Log_${monthNames[month]}_${year}.xlsx`);
+    }
+
+    function renderDashboard() {
+      const completed = appData.workouts ? appData.workouts.filter(w => w.status === 'Completed') : [];
+      document.getElementById('dash-total-workouts').innerText = completed.length;
+
+      const abSessionsCount = appData.workouts ? appData.workouts.filter(w => w.exercises && w.exercises.some(e => e.name === "Abs")).length : 0;
+      document.getElementById('dash-ab-sessions').innerText = abSessionsCount;
+
+      const latestWeight = appData.measurements && appData.measurements.length > 0 
+        ? [...appData.measurements].sort((a,b) => new Date(a.date) - new Date(b.date)).pop().weight.toFixed(1) + ' kg' 
+        : '-- kg';
+      document.getElementById('dash-bodyweight').innerText = latestWeight;
+
+      const splitContainer = document.getElementById('split-container');
+      const currentDayIdx = new Date().getDay();
+
+      splitContainer.innerHTML = DAY_NAMES.map((day, idx) => `
+        <div class="split-day-item ${idx === currentDayIdx ? 'today' : ''}">
+          <h4>${day}</h4><p>${DEFAULT_SPLITS[idx]}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderCalendar() {
+      const year = parseInt(document.getElementById('cal-year-select').value);
+      const month = parseInt(document.getElementById('cal-month-select').value);
+      const container = document.getElementById('calendar-days-container');
+      container.innerHTML = '';
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) container.innerHTML += `<div class="calendar-day empty"></div>`;
+
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const workout = appData.workouts ? appData.workouts.find(w => w.date === dateStr) : null;
+
+        let statusTag = '';
+        if(workout) {
+          statusTag = `<span class="status-indicator status-${workout.status.toLowerCase()}">${workout.status}</span>`;
+        }
+        let dateStyleClass = dateStr === todayStr ? 'today-highlight' : (dateStr < todayStr ? 'past-date' : '');
+
+        container.innerHTML += `
+          <div class="calendar-day ${dateStyleClass}" onclick="openWorkoutModal('${dateStr}')">
+            <span class="day-num">${day}</span>
+            ${statusTag}
+          </div>
+        `;
+      }
+    }
+
+    function initCharts() {
+      const ctx1 = document.getElementById('chart-weight').getContext('2d');
+      chartWeightInstance = new Chart(ctx1, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Weight (kg)', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', tension: 0.3, fill: true }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+      });
+
+      const ctx2 = document.getElementById('chart-abs').getContext('2d');
+      chartAbInstance = new Chart(ctx2, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Ab Weight (kg)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.3, fill: true }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+      });
+
+      updateCharts();
+    }
+
+    function updateCharts() {
+      if(!chartWeightInstance || !chartAbInstance) return;
+
+      const sortedM = appData.measurements ? [...appData.measurements].sort((a,b) => new Date(a.date) - new Date(b.date)) : [];
+      chartWeightInstance.data.labels = sortedM.map(m => m.date);
+      chartWeightInstance.data.datasets[0].data = sortedM.map(m => m.weight);
+      chartWeightInstance.update();
+
+      const abWorkouts = appData.workouts ? appData.workouts.filter(w => w.exercises && w.exercises.some(e => e.name === "Abs")).sort((a,b) => new Date(a.date) - new Date(b.date)) : [];
+      const abLabels = abWorkouts.map(w => w.date);
+      const abMaxWeights = abWorkouts.map(w => {
+        const abEx = w.exercises.find(e => e.name === "Abs");
+        return abEx && abEx.sets.length > 0 ? Math.max(...abEx.sets.map(s => s.weight)) : 0;
+      });
+
+      chartAbInstance.data.labels = abLabels;
+      chartAbInstance.data.datasets[0].data = abMaxWeights;
+      chartAbInstance.update();
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `muscle_tracker_backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if(imported.workouts && imported.measurements) {
+            appData = imported;
+            saveData();
+            location.reload();
+          } else {
+            alert("Invalid data format file.");
+          }
+        } catch(err) {
+          alert("Error parsing uploaded JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllData() {
+      if(confirm("Are you sure you want to reset all application data? This action cannot be undone.")) {
+        localStorage.removeItem("muscle_progress_data");
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
