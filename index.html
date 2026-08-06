@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Muscle Progress Tracker & Abs Hub</title>
-  <link rel="icon" type="image/png" href="gym.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="gym.png">[cite: 1]
+
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -581,42 +584,46 @@
       </div>
     </section>
 
-    <!-- NEW SCREEN: PERSONAL RECORDS (2-Column Muscle Group Grid) -->
+    <!-- PERSONAL RECORDS -->
     <section id="view-personal-records" class="view-section">
       <div class="section-title"><span>Personal Records (PRs)</span></div>
       <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Your all-time maximum weight and best set lifted for each exercise grouped by muscle group.</p>
-      
-      <!-- 2-Column Grid Container -->
-      <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
-        <!-- Dynamically injected via JavaScript -->
-      </div>
+      <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;"></div>
     </section>
 
-    <!-- NEW SCREEN: BODY MEASUREMENT TRACKER -->
+    <!-- MONTHLY MEASUREMENT TRACKER -->
     <section id="view-body-measurements" class="view-section">
       <div class="section-title">
         <span>Monthly Body Measurements Tracker</span>
-        <button class="btn btn-primary" onclick="openMeasurementModal()"><i class="fa-solid fa-plus"></i> Log Monthly Entry</button>
+        <div class="input-group" style="margin:0; width: 120px;">
+          <select id="measurements-year-select" class="input-control" onchange="renderMeasurementTable()">
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+          </select>
+        </div>
       </div>
-      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Track your physique changes measured at the end of every month.</p>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Track your physique changes measured at the end of every month. Click edit to update and save directly.</p>
       
       <div class="glass-card">
         <div class="exercise-table-container">
           <table class="exercise-table">
             <thead>
               <tr>
-                <th>Date / Month</th>
-                <th>Body Weight (kg)</th>
+                <th>Month</th>
                 <th>Chest</th>
                 <th>Waist</th>
                 <th>Hips</th>
-                <th>Biceps (L/R)</th>
-                <th>Thighs (L/R)</th>
-                <th>Calves (L/R)</th>
+                <th>Biceps (L / R)</th>
+                <th>Thighs (L / R)</th>
+                <th>Calves (L / R)</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="measurement-table-body">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No monthly measurements recorded yet.</td></tr>
+              <!-- Dynamically rendered 12 months -->
             </tbody>
           </table>
         </div>
@@ -726,7 +733,6 @@
             <div class="exercise-section-header" id="header-muscle-2">Muscle Group 2</div>
             <div class="exercise-grid-container" id="container-muscle-2"></div>
 
-            <!-- CALISTHENICS 4 COLUMNS SECTION -->
             <div class="exercise-section-header calisthenics-header"><i class="fa-solid fa-bolt"></i> Calisthenics & Core (Pushups, Pullups, Squats, Abs)</div>
             <div class="exercise-grid-container" id="container-calisthenics"></div>
           </div>
@@ -740,70 +746,6 @@
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
           <button type="button" class="btn btn-secondary" onclick="closeWorkoutModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Workout Log</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MONTHLY MEASUREMENT MODAL -->
-  <div class="modal-overlay" id="measurement-modal">
-    <div class="modal-content glass-card" style="max-width: 600px;">
-      <div class="modal-header">
-        <h3>Log Monthly Measurements</h3>
-        <button class="modal-close" onclick="closeMeasurementModal()">&times;</button>
-      </div>
-      
-      <form id="measurement-form" onsubmit="saveMeasurementLog(event)">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div class="input-group">
-            <label>Date (End of Month)</label>
-            <input type="date" id="m-date" class="input-control" required>
-          </div>
-          <div class="input-group">
-            <label>Body Weight (kg)</label>
-            <input type="number" step="0.1" id="m-weight" class="input-control" placeholder="e.g. 70.5" required>
-          </div>
-          <div class="input-group">
-            <label>Chest</label>
-            <input type="number" step="0.1" id="m-chest" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Waist</label>
-            <input type="number" step="0.1" id="m-waist" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Hips</label>
-            <input type="number" step="0.1" id="m-hips" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Left Biceps</label>
-            <input type="number" step="0.1" id="m-left-biceps" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Right Biceps</label>
-            <input type="number" step="0.1" id="m-right-biceps" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Left Thigh</label>
-            <input type="number" step="0.1" id="m-left-thigh" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Right Thigh</label>
-            <input type="number" step="0.1" id="m-right-thigh" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Left Calf</label>
-            <input type="number" step="0.1" id="m-left-calves" class="input-control" placeholder="cm / inches">
-          </div>
-          <div class="input-group">
-            <label>Right Calf</label>
-            <input type="number" step="0.1" id="m-right-calves" class="input-control" placeholder="cm / inches">
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-          <button type="button" class="btn btn-secondary" onclick="closeMeasurementModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Measurements</button>
         </div>
       </form>
     </div>
@@ -859,6 +801,8 @@
     };
 
     const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     let appData = { workouts: [], measurements: [] };
     let chartWeightInstance = null;
@@ -873,6 +817,7 @@
       document.getElementById('cal-month-select').value = today.getMonth().toString();
       document.getElementById('log-filter-year').value = today.getFullYear().toString();
       document.getElementById('log-filter-month').value = today.getMonth().toString();
+      document.getElementById('measurements-year-select').value = today.getFullYear().toString();
 
       renderDashboard();
       renderCalendar();
@@ -963,7 +908,6 @@
         }
       }
 
-      // Calisthenics 4 Columns (Pushups, Pullups, Squats, Abs)
       const calisthenicsItems = ["PushUps", "PullUps", "Squats", "Abs"];
       calisthenicsItems.forEach(exName => {
         const savedEx = savedExercises.find(ex => ex.name === exName) || { name: exName, sets: [{reps: 15, weight: 0}, {reps: 15, weight: 0}, {reps: 15, weight: 0}] };
@@ -1128,43 +1072,6 @@
 
     function closeWorkoutModal() { document.getElementById('workout-modal').classList.remove('active'); }
 
-    function openMeasurementModal() {
-      const modal = document.getElementById('measurement-modal');
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('m-date').value = today;
-      document.getElementById('measurement-form').reset();
-      document.getElementById('m-date').value = today;
-      modal.classList.add('active');
-    }
-
-    function closeMeasurementModal() { document.getElementById('measurement-modal').classList.remove('active'); }
-
-    function saveMeasurementLog(e) {
-      e.preventDefault();
-      const date = document.getElementById('m-date').value;
-      const weight = parseFloat(document.getElementById('m-weight').value) || 0;
-      const chest = parseFloat(document.getElementById('m-chest').value) || null;
-      const waist = parseFloat(document.getElementById('m-waist').value) || null;
-      const hips = parseFloat(document.getElementById('m-hips').value) || null;
-      const leftBiceps = parseFloat(document.getElementById('m-left-biceps').value) || null;
-      const rightBiceps = parseFloat(document.getElementById('m-right-biceps').value) || null;
-      const leftThigh = parseFloat(document.getElementById('m-left-thigh').value) || null;
-      const rightThigh = parseFloat(document.getElementById('m-right-thigh').value) || null;
-      const leftCalves = parseFloat(document.getElementById('m-left-calves').value) || null;
-      const rightCalves = parseFloat(document.getElementById('m-right-calves').value) || null;
-
-      appData.measurements = appData.measurements.filter(m => m.date !== date);
-      appData.measurements.push({
-        date, weight, chest, waist, hips, leftBiceps, rightBiceps, leftThigh, rightThigh, leftCalves, rightCalves
-      });
-
-      saveData();
-      closeMeasurementModal();
-      renderDashboard();
-      renderMeasurementTable();
-      updateCharts();
-    }
-
     function toggleModalFieldsByStatus() {
       const status = document.getElementById('log-status').value;
       document.getElementById('modal-workout-details').style.display = status === 'Completed' ? 'block' : 'none';
@@ -1321,25 +1228,98 @@
 
     function renderMeasurementTable() {
       const tbody = document.getElementById('measurement-table-body');
-      const sorted = appData.measurements ? [...appData.measurements].sort((a,b) => new Date(b.date) - new Date(a.date)) : [];
+      const year = parseInt(document.getElementById('measurements-year-select').value);
+      let rowsHtml = '';
 
-      if(sorted.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No monthly measurements recorded yet.</td></tr>`;
-        return;
+      for (let mIdx = 0; mIdx < 12; mIdx++) {
+        const shortMonthName = SHORT_MONTH_NAMES[mIdx];
+        const dateStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-28`;
+        
+        const existing = appData.measurements ? appData.measurements.find(m => m.date === dateStr || (m.monthIndex === mIdx && m.year === year)) : null;
+
+        const chest = existing && existing.chest !== null ? existing.chest : '';
+        const waist = existing && existing.waist !== null ? existing.waist : '';
+        const hips = existing && existing.hips !== null ? existing.hips : '';
+        const lBic = existing && existing.leftBiceps !== null ? existing.leftBiceps : '';
+        const rBic = existing && existing.rightBiceps !== null ? existing.rightBiceps : '';
+        const lThi = existing && existing.leftThigh !== null ? existing.leftThigh : '';
+        const rThi = existing && existing.rightThigh !== null ? existing.rightThigh : '';
+        const lCal = existing && existing.leftCalves !== null ? existing.leftCalves : '';
+        const rCal = existing && existing.rightCalves !== null ? existing.rightCalves : '';
+
+        rowsHtml += `
+          <tr id="meas-row-${mIdx}">
+            <td><strong style="color: var(--accent);">${shortMonthName}</strong></td>
+            <td><input type="number" step="0.1" class="input-control meas-chest" value="${chest}" placeholder="--" disabled style="width:60px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-waist" value="${waist}" placeholder="--" disabled style="width:60px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-hips" value="${hips}" placeholder="--" disabled style="width:60px;"></td>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <input type="number" step="0.1" class="input-control meas-l-bic" value="${lBic}" placeholder="L" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+                <input type="number" step="0.1" class="input-control meas-r-bic" value="${rBic}" placeholder="R" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+              </div>
+            </td>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <input type="number" step="0.1" class="input-control meas-l-thi" value="${lThi}" placeholder="L" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+                <input type="number" step="0.1" class="input-control meas-r-thi" value="${rThi}" placeholder="R" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+              </div>
+            </td>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <input type="number" step="0.1" class="input-control meas-l-cal" value="${lCal}" placeholder="L" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+                <input type="number" step="0.1" class="input-control meas-r-cal" value="${rCal}" placeholder="R" disabled style="width:65px; padding:2px 4px; font-size:0.7rem;">
+              </div>
+            </td>
+            <td>
+              <button class="btn btn-secondary" id="meas-btn-${mIdx}" onclick="toggleEditMeasurement(${mIdx}, '${dateStr}', ${year})" style="padding: 4px 8px; font-size: 0.7rem;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+            </td>
+          </tr>
+        `;
       }
 
-      tbody.innerHTML = sorted.map(m => `
-        <tr>
-          <td><strong style="color: var(--accent);">${m.date}</strong></td>
-          <td>${m.weight ? m.weight.toFixed(1) + ' kg' : '--'}</td>
-          <td>${m.chest !== null ? m.chest : '--'}</td>
-          <td>${m.waist !== null ? m.waist : '--'}</td>
-          <td>${m.hips !== null ? m.hips : '--'}</td>
-          <td>${m.leftBiceps !== null || m.rightBiceps !== null ? `${m.leftBiceps ?? '--'} / ${m.rightBiceps ?? '--'}` : '--'}</td>
-          <td>${m.leftThigh !== null || m.rightThigh !== null ? `${m.leftThigh ?? '--'} / ${m.rightThigh ?? '--'}` : '--'}</td>
-          <td>${m.leftCalves !== null || m.rightCalves !== null ? `${m.leftCalves ?? '--'} / ${m.rightCalves ?? '--'}` : '--'}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function toggleEditMeasurement(mIdx, dateStr, year) {
+      const row = document.getElementById(`meas-row-${mIdx}`);
+      const btn = document.getElementById(`meas-btn-${mIdx}`);
+      const inputs = row.querySelectorAll('input');
+      const isEditing = btn.innerHTML.includes('Save');
+
+      if (!isEditing) {
+        inputs.forEach(input => input.disabled = false);
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save`;
+        btn.className = "btn btn-primary";
+      } else {
+        const chest = parseFloat(row.querySelector('.meas-chest').value) || null;
+        const waist = parseFloat(row.querySelector('.meas-waist').value) || null;
+        const hips = parseFloat(row.querySelector('.meas-hips').value) || null;
+        const leftBiceps = parseFloat(row.querySelector('.meas-l-bic').value) || null;
+        const rightBiceps = parseFloat(row.querySelector('.meas-r-bic').value) || null;
+        const leftThigh = parseFloat(row.querySelector('.meas-l-thi').value) || null;
+        const rightThigh = parseFloat(row.querySelector('.meas-r-thi').value) || null;
+        const leftCalves = parseFloat(row.querySelector('.meas-l-cal').value) || null;
+        const rightCalves = parseFloat(row.querySelector('.meas-r-cal').value) || null;
+
+        appData.measurements = appData.measurements.filter(m => m.date !== dateStr && !(m.monthIndex === mIdx && m.year === year));
+        appData.measurements.push({
+          date: dateStr,
+          monthIndex: mIdx,
+          year: year,
+          weight: 0, 
+          chest, waist, hips, leftBiceps, rightBiceps, leftThigh, rightThigh, leftCalves, rightCalves
+        });
+
+        saveData();
+
+        inputs.forEach(input => input.disabled = true);
+        btn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit`;
+        btn.className = "btn btn-secondary";
+        updateCharts();
+      }
     }
 
     function exportToExcel() {
@@ -1414,7 +1394,7 @@
       document.getElementById('dash-ab-sessions').innerText = abSessionsCount;
 
       const latestWeight = appData.measurements && appData.measurements.length > 0 
-        ? [...appData.measurements].sort((a,b) => new Date(a.date) - new Date(b.date)).pop().weight.toFixed(1) + ' kg' 
+        ? [...appData.measurements].filter(m => m.weight > 0).sort((a,b) => new Date(a.date) - new Date(b.date)).pop()?.weight.toFixed(1) + ' kg' || '-- kg'
         : '-- kg';
       document.getElementById('dash-bodyweight').innerText = latestWeight;
 
@@ -1482,7 +1462,7 @@
     function updateCharts() {
       if(!chartWeightInstance || !chartAbInstance) return;
 
-      const sortedM = appData.measurements ? [...appData.measurements].sort((a,b) => new Date(a.date) - new Date(b.date)) : [];
+      const sortedM = appData.measurements ? [...appData.measurements].filter(m => m.weight > 0).sort((a,b) => new Date(a.date) - new Date(b.date)) : [];
       chartWeightInstance.data.labels = sortedM.map(m => m.date);
       chartWeightInstance.data.datasets[0].data = sortedM.map(m => m.weight);
       chartWeightInstance.update();
