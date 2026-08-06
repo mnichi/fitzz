@@ -588,7 +588,7 @@
       <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;"></div>
     </section>
 
-    <!-- MONTHLY MEASUREMENT TRACKER (UPDATED: 12 MONTHS, NO WEIGHT COLUMN, INLINE EDIT/SAVE) -->
+    <!-- MONTHLY MEASUREMENT TRACKER (TRANSPOSED: MONTHS AS ROWS, NO HORIZONTAL SCROLL) -->
     <section id="view-body-measurements" class="view-section">
       <div class="section-title">
         <span>Monthly Body Measurements Tracker</span>
@@ -620,7 +620,7 @@
               </tr>
             </thead>
             <tbody id="measurement-table-body">
-              <!-- Dynamically rendered 12 months -->
+              <!-- Dynamically rendered 12 months as rows -->
             </tbody>
           </table>
         </div>
@@ -1222,7 +1222,7 @@
       container.innerHTML = htmlContent;
     }
 
-    /* MONTHLY MEASUREMENTS: 12 MONTHS, NO WEIGHT, INLINE EDIT/SAVE */
+    /* MONTHLY MEASUREMENTS: 12 MONTHS AS ROWS (TRANSPOSED LAYOUT) */
     function renderMeasurementTable() {
       const tbody = document.getElementById('measurement-table-body');
       const year = parseInt(document.getElementById('measurements-year-select').value);
@@ -1230,7 +1230,7 @@
 
       for (let mIdx = 0; mIdx < 12; mIdx++) {
         const monthName = MONTH_NAMES[mIdx];
-        const dateStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-28`; // Standardized month tracking identifier
+        const dateStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-28`;
         
         const existing = appData.measurements ? appData.measurements.find(m => m.date === dateStr || (m.monthIndex === mIdx && m.year === year)) : null;
 
@@ -1246,7 +1246,7 @@
 
         rowsHtml += `
           <tr id="meas-row-${mIdx}">
-            <td><strong style="color: var(--accent);">${monthName} ${year}</strong></td>
+            <td><strong style="color: var(--accent);">${monthName}</strong></td>
             <td><input type="number" step="0.1" class="input-control meas-chest" value="${chest}" placeholder="--" disabled style="width:70px;"></td>
             <td><input type="number" step="0.1" class="input-control meas-waist" value="${waist}" placeholder="--" disabled style="width:70px;"></td>
             <td><input type="number" step="0.1" class="input-control meas-hips" value="${hips}" placeholder="--" disabled style="width:70px;"></td>
