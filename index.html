@@ -148,7 +148,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 14px;
+      padding: 12px 14px; /* Optimized touch target for mobile */
       background: transparent;
       border: none;
       border-radius: var(--radius-md);
@@ -196,7 +196,15 @@
     }
     .info-badge i { color: var(--accent); }
 
-    .mobile-toggle { display: none; background: none; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; }
+    .mobile-toggle { 
+      display: none; 
+      background: none; 
+      border: none; 
+      color: var(--text-main); 
+      font-size: 1.5rem; 
+      cursor: pointer; 
+      padding: 4px; 
+    }
 
     footer {
       margin-top: auto;
@@ -211,10 +219,10 @@
     .view-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
     .btn {
-      padding: 6px 12px;
+      padding: 8px 14px; /* Enhanced mobile touch dimensions */
       border-radius: var(--radius-md);
       border: none;
       font-weight: 600;
@@ -238,12 +246,12 @@
     .input-group label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
     .input-control, select, textarea {
       width: 100%;
-      padding: 5px 8px;
+      padding: 8px 10px; /* Enhanced sizing to prevent iOS zoom */
       background: rgba(9, 9, 11, 0.6);
       border: 1px solid var(--bg-card-border);
       border-radius: var(--radius-md);
       color: var(--text-main);
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       outline: none;
       transition: var(--transition);
     }
@@ -279,7 +287,7 @@
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .calendar-day-head { text-align: center; font-weight: 600; font-size: 0.65rem; color: var(--text-muted); padding: 2px; }
     .calendar-day {
-      min-height: 40px; max-height: 46px;
+      min-height: 44px; max-height: 52px;
       background: rgba(18, 18, 20, 0.6);
       border: 1px solid var(--bg-card-border);
       border-radius: var(--radius-sm);
@@ -308,9 +316,9 @@
     .status-rest { background: rgba(107, 114, 128, 0.2); color: var(--status-rest); border: 1px solid var(--status-rest); }
 
     /* Tables */
-    .exercise-table-container { overflow-x: auto; margin-top: 10px; }
+    .exercise-table-container { overflow-x: auto; margin-top: 10px; -webkit-overflow-scrolling: touch; }
     .exercise-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .exercise-table th, .exercise-table td { padding: 8px 10px; border-bottom: 1px solid var(--bg-card-border); font-size: 0.75rem; white-space: nowrap; }
+    .exercise-table th, .exercise-table td { padding: 10px 12px; border-bottom: 1px solid var(--bg-card-border); font-size: 0.75rem; white-space: nowrap; }
     .exercise-table th { color: var(--text-muted); font-weight: 600; background: rgba(9, 9, 11, 0.4); }
 
     /* Modal Dialogs */
@@ -328,12 +336,12 @@
     .modal-overlay.active { display: flex; }
     .modal-content { width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 8px; }
-    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 4px; }
 
     /* Horizontal Exercise Grid */
     .exercise-grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 8px;
       margin-bottom: 10px;
     }
@@ -351,21 +359,24 @@
       background: rgba(56, 189, 248, 0.03);
     }
     .exercise-block-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .exercise-block-header select { flex: 1; font-weight: 600; color: var(--accent); padding: 3px; font-size: 0.7rem; }
+    .exercise-block-header select { flex: 1; font-weight: 600; color: var(--accent); padding: 4px; font-size: 0.75rem; }
     .exercise-block.calisthenics-block .exercise-block-header select { color: var(--ab-accent); }
     .sets-container { display: flex; flex-direction: column; gap: 3px; }
     .set-row {
       display: grid;
-      grid-template-columns: 32px 1fr 1fr 22px;
+      grid-template-columns: 32px 1fr 28px;
       gap: 4px;
       align-items: center;
       background: rgba(24, 24, 27, 0.5);
-      padding: 2px 4px;
+      padding: 3px 4px;
       border-radius: var(--radius-sm);
       border: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .set-row input { padding: 2px 4px; font-size: 0.7rem; text-align: center; }
-    .set-label { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); }
+    .set-row.weighted-set {
+      grid-template-columns: 32px 1fr 1fr 28px;
+    }
+    .set-row input { padding: 4px; font-size: 0.75rem; text-align: center; }
+    .set-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); }
 
     .exercise-section-header {
       color: var(--accent);
@@ -456,37 +467,37 @@
         </div>
       </div>
 
-      <!-- DAILY WARMUP CHECKLIST (5 COLUMNS) -->
+      <!-- DAILY WARMUP CHECKLIST -->
       <div class="glass-card">
         <h3><i class="fa-solid fa-fire-flame-curved" style="color: var(--accent);"></i> Daily Warmup Checklist</h3>
         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Complete your warmup routine before training sessions.</p>
         
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 0.72rem;">
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; font-size: 0.72rem;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Head turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Wrist turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Waist turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Elbow turn (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Front arm swing (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cross arm swing (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cross body toe (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Arm Circles (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cat-Cow Stretch (10x)
           </label>
         </div>
@@ -588,7 +599,7 @@
       <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;"></div>
     </section>
 
-    <!-- MONTHLY MEASUREMENT TRACKER (TRANSPOSED: MONTHS AS ROWS, NO HORIZONTAL SCROLL) -->
+    <!-- MONTHLY MEASUREMENT TRACKER -->
     <section id="view-body-measurements" class="view-section">
       <div class="section-title">
         <span>Monthly Body Measurements Tracker</span>
@@ -610,12 +621,15 @@
             <thead>
               <tr>
                 <th>Month</th>
-                <th>Chest</th>
-                <th>Waist</th>
-                <th>Hips</th>
-                <th>Biceps (L/R)</th>
-                <th>Thighs (L/R)</th>
-                <th>Calves (L/R)</th>
+                <th>Chest (in)</th>
+                <th>Waist (in)</th>
+                <th>Hips (in)</th>
+                <th>L. Biceps</th>
+                <th>R. Biceps</th>
+                <th>L. Thigh</th>
+                <th>R. Thigh</th>
+                <th>L. Calves</th>
+                <th>R. Calves</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -683,7 +697,7 @@
       </div>
       
       <form id="workout-form" onsubmit="saveWorkoutLog(event)">
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
           <div class="input-group">
             <label>Date</label>
             <input type="date" id="log-date" class="input-control" required onchange="onDateChanged()">
@@ -703,7 +717,7 @@
         </div>
 
         <div id="modal-workout-details">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 8px;">
             <div class="input-group">
               <label>Target Split</label>
               <select id="log-split-select" class="input-control" onchange="onSplitSelectChange()">
@@ -754,7 +768,7 @@
     const EXERCISE_DATABASE = {
       "Chest": [
         "Dumbell Chest Press", "Barbell Chest Press", "Smith Machine Chest Press", 
-        "Smith Machine Incline Chest Press", "Dumbell Incline Chest Press", "Barbell Incline Chest Press", 
+        "Smith Machine Incline Chest Press", "Dumbbell Incline Chest Press", "Barbell Incline Chest Press", 
         "Pec Fly Machine", "Dumbbell Close Grip Press", "Cable Chest Fly", "Chest Dips", "Smith Machine Decline Chest Press"
       ],
       "Triceps": [
@@ -823,7 +837,10 @@
       initCharts();
     });
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+    function toggleSidebar() { 
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active'); 
+    }
 
     function switchView(viewName) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -838,6 +855,11 @@
           btn.parentElement.classList.add('active');
         }
       });
+
+      // Auto close sidebar on mobile when navigating
+      if (window.innerWidth <= 902) {
+        document.getElementById('sidebar').classList.remove('active');
+      }
 
       if(viewName === 'personal-records') renderPersonalRecords();
       if(viewName === 'body-measurements') renderMeasurementTable();
@@ -906,7 +928,7 @@
 
       const calisthenicsItems = ["PushUps", "PullUps", "Squats", "Abs"];
       calisthenicsItems.forEach(exName => {
-        const savedEx = savedExercises.find(ex => ex.name === exName) || { name: exName, sets: [{reps: 15, weight: 0}, {reps: 15, weight: 0}, {reps: 15, weight: 0}] };
+        const savedEx = savedExercises.find(ex => ex.name === exName) || { name: exName, sets: [{reps: 15}, {reps: 15}, {reps: 15}] };
         cCalisthenics.appendChild(createExerciseBlock([exName], "Calisthenics", exName, savedEx.sets || [], true));
       });
     }
@@ -925,7 +947,7 @@
           <select class="input-control ex-name-select" ${isCalisthenics ? 'disabled' : ''}>
             ${optionsHtml}
           </select>
-          <button type="button" class="btn btn-secondary" style="padding: 2px 5px; font-size: 0.65rem;" onclick="addSetRow(this)">
+          <button type="button" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.7rem;" onclick="addSetRow(this, ${isCalisthenics})">
             <i class="fa-solid fa-plus"></i> Set
           </button>
         </div>
@@ -940,30 +962,41 @@
       ];
 
       initialSets.forEach((s, idx) => {
-        setsContainer.appendChild(createSetRowHtml(idx + 1, s.reps, s.weight));
+        setsContainer.appendChild(createSetRowHtml(idx + 1, s.reps, s.weight, isCalisthenics));
       });
 
       return block;
     }
 
-    function createSetRowHtml(setNum, reps = 15, weight = 0) {
+    function createSetRowHtml(setNum, reps = 15, weight = 0, isCalisthenics = false) {
       const row = document.createElement('div');
-      row.className = 'set-row';
-      row.innerHTML = `
-        <span class="set-label">S${setNum}</span>
-        <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
-        <input type="number" step="0.5" class="input-control set-weight" placeholder="kg" value="${weight}">
-        <button type="button" class="btn btn-danger" style="padding: 1px 4px; font-size: 0.6rem;" onclick="removeSetRow(this)">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      `;
+      row.className = isCalisthenics ? 'set-row' : 'set-row weighted-set';
+      
+      if (isCalisthenics) {
+        row.innerHTML = `
+          <span class="set-label">S${setNum}</span>
+          <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
+          <button type="button" class="btn btn-danger" style="padding: 4px 6px; font-size: 0.7rem;" onclick="removeSetRow(this)">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+      } else {
+        row.innerHTML = `
+          <span class="set-label">S${setNum}</span>
+          <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
+          <input type="number" step="0.5" class="input-control set-weight" placeholder="kg" value="${weight}">
+          <button type="button" class="btn btn-danger" style="padding: 4px 6px; font-size: 0.7rem;" onclick="removeSetRow(this)">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+      }
       return row;
     }
 
-    function addSetRow(btnBtn) {
+    function addSetRow(btnBtn, isCalisthenics = false) {
       const setsContainer = btnBtn.closest('.exercise-block').querySelector('.sets-container');
       const currentSetCount = setsContainer.children.length;
-      setsContainer.appendChild(createSetRowHtml(currentSetCount + 1, 15, 0));
+      setsContainer.appendChild(createSetRowHtml(currentSetCount + 1, 15, 0, isCalisthenics));
     }
 
     function removeSetRow(btnBtn) {
@@ -998,10 +1031,11 @@
             const setRows = block.querySelectorAll('.set-row');
             const sets = [];
             setRows.forEach((sr, idx) => {
+              const weightInput = sr.querySelector('.set-weight');
               sets.push({
                 setNum: idx + 1,
                 reps: parseInt(sr.querySelector('.set-reps').value) || 0,
-                weight: parseFloat(sr.querySelector('.set-weight').value) || 0
+                weight: weightInput ? (parseFloat(weightInput.value) || 0) : 0
               });
             });
             if(sets.length > 0) exercises.push({ name: exName, muscleGroup: muscleGroup, sets: sets });
@@ -1107,10 +1141,17 @@
         
         if (workout && workout.exercises && workout.exercises.length > 0) {
           let exerciseHtml = workout.exercises.map((ex, idx) => {
-            const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+            const isCalisthenics = ex.muscleGroup === 'Calisthenics' || ["PushUps", "PullUps", "Squats", "Abs"].includes(ex.name);
             const isHighlighted = idx >= 8;
             const nameColor = isHighlighted ? 'color: var(--ab-accent); font-weight: 700;' : '';
-            return `<div style="margin-bottom: 2px;"><span style="${nameColor}">${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)</span></div>`;
+            
+            if (isCalisthenics) {
+              const totalReps = ex.sets.reduce((sum, s) => sum + (s.reps || 0), 0);
+              return `<div style="margin-bottom: 2px;"><span style="${nameColor}">${idx + 1}. ${ex.name} (${totalReps} total reps, ${ex.sets.length} sets)</span></div>`;
+            } else {
+              const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+              return `<div style="margin-bottom: 2px;"><span style="${nameColor}">${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)</span></div>`;
+            }
           }).join('');
 
           let muscleGroupText = workout.split || (workout.status === 'Completed' ? 'General' : workout.status);
@@ -1151,16 +1192,28 @@
         appData.workouts.forEach(w => {
           if(w.exercises) {
             w.exercises.forEach(ex => {
+              const isCalisthenics = ex.muscleGroup === 'Calisthenics' || ["PushUps", "PullUps", "Squats", "Abs"].includes(ex.name);
               ex.sets.forEach(s => {
-                if(!prMap[ex.name] || s.weight > prMap[ex.name].weight) {
-                  prMap[ex.name] = {
-                    exerciseName: ex.name,
-                    muscleGroup: ex.muscleGroup || 'General',
-                    weight: s.weight,
-                    reps: s.reps,
-                    setNum: s.setNum,
-                    date: w.date
-                  };
+                if(!isCalisthenics) {
+                  if(!prMap[ex.name] || s.weight > prMap[ex.name].weight) {
+                    prMap[ex.name] = {
+                      exerciseName: ex.name,
+                      muscleGroup: ex.muscleGroup || 'General',
+                      displayValue: `${s.weight.toFixed(1)} kg`,
+                      subText: `Set ${s.setNum} (${s.reps} reps) • ${w.date}`,
+                      sortVal: s.weight
+                    };
+                  }
+                } else {
+                  if(!prMap[ex.name] || s.reps > prMap[ex.name].sortVal) {
+                    prMap[ex.name] = {
+                      exerciseName: ex.name,
+                      muscleGroup: 'Calisthenics',
+                      displayValue: `${s.reps} reps`,
+                      subText: `Set ${s.setNum} • ${w.date}`,
+                      sortVal: s.reps
+                    };
+                  }
                 }
               });
             });
@@ -1191,7 +1244,7 @@
       muscleOrder.forEach(muscle => {
         const exercisesInGroup = groupedByMuscle[muscle];
         if(exercisesInGroup && exercisesInGroup.length > 0) {
-          exercisesInGroup.sort((a, b) => b.weight - a.weight);
+          exercisesInGroup.sort((a, b) => b.sortVal - a.sortVal);
 
           htmlContent += `
             <div class="glass-card" style="margin-bottom: 0;">
@@ -1206,10 +1259,10 @@
               <div style="background: rgba(9,9,11,0.4); border: 1px solid var(--bg-card-border); padding: 6px 8px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <div style="font-weight: 600; font-size: 0.78rem; color: var(--text-main);">${pr.exerciseName}</div>
-                  <div style="font-size: 0.65rem; color: var(--text-muted);">Set ${pr.setNum} (${pr.reps} reps) • ${pr.date}</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">${pr.subText}</div>
                 </div>
                 <div style="font-weight: 700; font-size: 0.85rem; color: var(--ab-accent);">
-                  ${pr.weight.toFixed(1)} kg
+                  ${pr.displayValue}
                 </div>
               </div>
             `;
@@ -1222,7 +1275,6 @@
       container.innerHTML = htmlContent;
     }
 
-    /* MONTHLY MEASUREMENTS: 12 MONTHS AS ROWS (TRANSPOSED LAYOUT) */
     function renderMeasurementTable() {
       const tbody = document.getElementById('measurement-table-body');
       const year = parseInt(document.getElementById('measurements-year-select').value);
@@ -1250,26 +1302,14 @@
             <td><input type="number" step="0.1" class="input-control meas-chest" value="${chest}" placeholder="--" disabled style="width:70px;"></td>
             <td><input type="number" step="0.1" class="input-control meas-waist" value="${waist}" placeholder="--" disabled style="width:70px;"></td>
             <td><input type="number" step="0.1" class="input-control meas-hips" value="${hips}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-l-bic" value="${lBic}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-r-bic" value="${rBic}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-l-thi" value="${lThi}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-r-thi" value="${rThi}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-l-cal" value="${lCal}" placeholder="--" disabled style="width:70px;"></td>
+            <td><input type="number" step="0.1" class="input-control meas-r-cal" value="${rCal}" placeholder="--" disabled style="width:70px;"></td>
             <td>
-              <div style="display: flex; gap: 4px;">
-                <input type="number" step="0.1" class="input-control meas-l-bic" value="${lBic}" placeholder="L" disabled style="width:40px;">
-                <input type="number" step="0.1" class="input-control meas-r-bic" value="${rBic}" placeholder="R" disabled style="width:40px;">
-              </div>
-            </td>
-            <td>
-              <div style="display: flex; gap: 4px;">
-                <input type="number" step="0.1" class="input-control meas-l-thi" value="${lThi}" placeholder="L" disabled style="width:40px;">
-                <input type="number" step="0.1" class="input-control meas-r-thi" value="${rThi}" placeholder="R" disabled style="width:40px;">
-              </div>
-            </td>
-            <td>
-              <div style="display: flex; gap: 4px;">
-                <input type="number" step="0.1" class="input-control meas-l-cal" value="${lCal}" placeholder="L" disabled style="width:40px;">
-                <input type="number" step="0.1" class="input-control meas-r-cal" value="${rCal}" placeholder="R" disabled style="width:40px;">
-              </div>
-            </td>
-            <td>
-              <button class="btn btn-secondary" id="meas-btn-${mIdx}" onclick="toggleEditMeasurement(${mIdx}, '${dateStr}', ${year})" style="padding: 4px 8px; font-size: 0.7rem;">
+              <button class="btn btn-secondary" id="meas-btn-${mIdx}" onclick="toggleEditMeasurement(${mIdx}, '${dateStr}', ${year})" style="padding: 6px 10px; font-size: 0.7rem;">
                 <i class="fa-solid fa-pen-to-square"></i> Edit
               </button>
             </td>
@@ -1337,8 +1377,14 @@
 
         if (workout && workout.exercises && workout.exercises.length > 0) {
           let allExercisesText = workout.exercises.map((ex, idx) => {
-            const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
-            return `${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)`;
+            const isCalisthenics = ex.muscleGroup === 'Calisthenics' || ["PushUps", "PullUps", "Squats", "Abs"].includes(ex.name);
+            if (isCalisthenics) {
+              const totalReps = ex.sets.reduce((sum, s) => sum + (s.reps || 0), 0);
+              return `${idx + 1}. ${ex.name} (${totalReps} total reps, ${ex.sets.length} sets)`;
+            } else {
+              const maxWeight = ex.sets.length > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+              return `${idx + 1}. ${ex.name} (${maxWeight.toFixed(1)} kg, ${ex.sets.length} sets)`;
+            }
           }).join('\n');
 
           exportRows.push({
@@ -1449,7 +1495,7 @@
       const ctx2 = document.getElementById('chart-abs').getContext('2d');
       chartAbInstance = new Chart(ctx2, {
         type: 'line',
-        data: { labels: [], datasets: [{ label: 'Ab Weight (kg)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.3, fill: true }] },
+        data: { labels: [], datasets: [{ label: 'Ab Reps Progression', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.3, fill: true }] },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
       });
 
@@ -1466,13 +1512,14 @@
 
       const abWorkouts = appData.workouts ? appData.workouts.filter(w => w.exercises && w.exercises.some(e => e.name === "Abs")).sort((a,b) => new Date(a.date) - new Date(b.date)) : [];
       const abLabels = abWorkouts.map(w => w.date);
-      const abMaxWeights = abWorkouts.map(w => {
+      const abMaxReps = abWorkouts.map(w => {
         const abEx = w.exercises.find(e => e.name === "Abs");
-        return abEx && abEx.sets.length > 0 ? Math.max(...abEx.sets.map(s => s.weight)) : 0;
+        return abEx && abEx.sets.length > 0 ? Math.max(...abEx.sets.map(s => s.reps || 0)) : 0;
       });
 
       chartAbInstance.data.labels = abLabels;
-      chartAbInstance.data.datasets[0].data = abMaxWeights;
+      chartAbInstance.data.datasets[0].label = 'Ab Max Reps';
+      chartAbInstance.data.datasets[0].data = abMaxReps;
       chartAbInstance.update();
     }
 
