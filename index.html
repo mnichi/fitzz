@@ -148,7 +148,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px; /* Optimized touch target for mobile */
+      padding: 10px 14px;
       background: transparent;
       border: none;
       border-radius: var(--radius-md);
@@ -196,15 +196,7 @@
     }
     .info-badge i { color: var(--accent); }
 
-    .mobile-toggle { 
-      display: none; 
-      background: none; 
-      border: none; 
-      color: var(--text-main); 
-      font-size: 1.5rem; 
-      cursor: pointer; 
-      padding: 4px; 
-    }
+    .mobile-toggle { display: none; background: none; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; }
 
     footer {
       margin-top: auto;
@@ -219,10 +211,10 @@
     .view-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
 
     .btn {
-      padding: 8px 14px; /* Enhanced mobile touch dimensions */
+      padding: 6px 12px;
       border-radius: var(--radius-md);
       border: none;
       font-weight: 600;
@@ -246,12 +238,12 @@
     .input-group label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
     .input-control, select, textarea {
       width: 100%;
-      padding: 8px 10px; /* Enhanced sizing to prevent iOS zoom */
+      padding: 5px 8px;
       background: rgba(9, 9, 11, 0.6);
       border: 1px solid var(--bg-card-border);
       border-radius: var(--radius-md);
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       outline: none;
       transition: var(--transition);
     }
@@ -287,7 +279,7 @@
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .calendar-day-head { text-align: center; font-weight: 600; font-size: 0.65rem; color: var(--text-muted); padding: 2px; }
     .calendar-day {
-      min-height: 44px; max-height: 52px;
+      min-height: 40px; max-height: 46px;
       background: rgba(18, 18, 20, 0.6);
       border: 1px solid var(--bg-card-border);
       border-radius: var(--radius-sm);
@@ -316,9 +308,9 @@
     .status-rest { background: rgba(107, 114, 128, 0.2); color: var(--status-rest); border: 1px solid var(--status-rest); }
 
     /* Tables */
-    .exercise-table-container { overflow-x: auto; margin-top: 10px; -webkit-overflow-scrolling: touch; }
+    .exercise-table-container { overflow-x: auto; margin-top: 10px; }
     .exercise-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .exercise-table th, .exercise-table td { padding: 10px 12px; border-bottom: 1px solid var(--bg-card-border); font-size: 0.75rem; white-space: nowrap; }
+    .exercise-table th, .exercise-table td { padding: 8px 10px; border-bottom: 1px solid var(--bg-card-border); font-size: 0.75rem; white-space: nowrap; }
     .exercise-table th { color: var(--text-muted); font-weight: 600; background: rgba(9, 9, 11, 0.4); }
 
     /* Modal Dialogs */
@@ -336,12 +328,12 @@
     .modal-overlay.active { display: flex; }
     .modal-content { width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 8px; }
-    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 4px; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
 
     /* Horizontal Exercise Grid */
     .exercise-grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 8px;
       margin-bottom: 10px;
     }
@@ -359,24 +351,24 @@
       background: rgba(56, 189, 248, 0.03);
     }
     .exercise-block-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .exercise-block-header select { flex: 1; font-weight: 600; color: var(--accent); padding: 4px; font-size: 0.75rem; }
+    .exercise-block-header select { flex: 1; font-weight: 600; color: var(--accent); padding: 3px; font-size: 0.7rem; }
     .exercise-block.calisthenics-block .exercise-block-header select { color: var(--ab-accent); }
     .sets-container { display: flex; flex-direction: column; gap: 3px; }
     .set-row {
       display: grid;
-      grid-template-columns: 32px 1fr 28px;
+      grid-template-columns: 32px 1fr 22px;
       gap: 4px;
       align-items: center;
       background: rgba(24, 24, 27, 0.5);
-      padding: 3px 4px;
+      padding: 2px 4px;
       border-radius: var(--radius-sm);
       border: 1px solid rgba(255, 255, 255, 0.04);
     }
     .set-row.weighted-set {
-      grid-template-columns: 32px 1fr 1fr 28px;
+      grid-template-columns: 32px 1fr 1fr 22px;
     }
-    .set-row input { padding: 4px; font-size: 0.75rem; text-align: center; }
-    .set-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); }
+    .set-row input { padding: 2px 4px; font-size: 0.7rem; text-align: center; }
+    .set-label { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); }
 
     .exercise-section-header {
       color: var(--accent);
@@ -467,37 +459,37 @@
         </div>
       </div>
 
-      <!-- DAILY WARMUP CHECKLIST -->
+      <!-- DAILY WARMUP CHECKLIST (5 COLUMNS) -->
       <div class="glass-card">
         <h3><i class="fa-solid fa-fire-flame-curved" style="color: var(--accent);"></i> Daily Warmup Checklist</h3>
         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Complete your warmup routine before training sessions.</p>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; font-size: 0.72rem;">
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 0.72rem;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Head turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Wrist turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Waist turn (5x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Elbow turn (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Front arm swing (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cross arm swing (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cross body toe (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Arm Circles (10x)
           </label>
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(9,9,11,0.4); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
             <input type="checkbox" style="accent-color: var(--accent);"> Cat-Cow Stretch (10x)
           </label>
         </div>
@@ -599,7 +591,7 @@
       <div id="pr-grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;"></div>
     </section>
 
-    <!-- MONTHLY MEASUREMENT TRACKER -->
+    <!-- MONTHLY MEASUREMENT TRACKER (TRANSPOSED: MONTHS AS ROWS) -->
     <section id="view-body-measurements" class="view-section">
       <div class="section-title">
         <span>Monthly Body Measurements Tracker</span>
@@ -697,7 +689,7 @@
       </div>
       
       <form id="workout-form" onsubmit="saveWorkoutLog(event)">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="input-group">
             <label>Date</label>
             <input type="date" id="log-date" class="input-control" required onchange="onDateChanged()">
@@ -717,7 +709,7 @@
         </div>
 
         <div id="modal-workout-details">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 8px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
             <div class="input-group">
               <label>Target Split</label>
               <select id="log-split-select" class="input-control" onchange="onSplitSelectChange()">
@@ -837,10 +829,7 @@
       initCharts();
     });
 
-    function toggleSidebar() { 
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('active'); 
-    }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
 
     function switchView(viewName) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -855,11 +844,6 @@
           btn.parentElement.classList.add('active');
         }
       });
-
-      // Auto close sidebar on mobile when navigating
-      if (window.innerWidth <= 902) {
-        document.getElementById('sidebar').classList.remove('active');
-      }
 
       if(viewName === 'personal-records') renderPersonalRecords();
       if(viewName === 'body-measurements') renderMeasurementTable();
@@ -947,7 +931,7 @@
           <select class="input-control ex-name-select" ${isCalisthenics ? 'disabled' : ''}>
             ${optionsHtml}
           </select>
-          <button type="button" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.7rem;" onclick="addSetRow(this, ${isCalisthenics})">
+          <button type="button" class="btn btn-secondary" style="padding: 2px 5px; font-size: 0.65rem;" onclick="addSetRow(this, ${isCalisthenics})">
             <i class="fa-solid fa-plus"></i> Set
           </button>
         </div>
@@ -976,7 +960,7 @@
         row.innerHTML = `
           <span class="set-label">S${setNum}</span>
           <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
-          <button type="button" class="btn btn-danger" style="padding: 4px 6px; font-size: 0.7rem;" onclick="removeSetRow(this)">
+          <button type="button" class="btn btn-danger" style="padding: 1px 4px; font-size: 0.6rem;" onclick="removeSetRow(this)">
             <i class="fa-solid fa-xmark"></i>
           </button>
         `;
@@ -985,7 +969,7 @@
           <span class="set-label">S${setNum}</span>
           <input type="number" class="input-control set-reps" placeholder="Reps" value="${reps}" min="1">
           <input type="number" step="0.5" class="input-control set-weight" placeholder="kg" value="${weight}">
-          <button type="button" class="btn btn-danger" style="padding: 4px 6px; font-size: 0.7rem;" onclick="removeSetRow(this)">
+          <button type="button" class="btn btn-danger" style="padding: 1px 4px; font-size: 0.6rem;" onclick="removeSetRow(this)">
             <i class="fa-solid fa-xmark"></i>
           </button>
         `;
@@ -1275,6 +1259,7 @@
       container.innerHTML = htmlContent;
     }
 
+    /* MONTHLY MEASUREMENTS: 12 MONTHS AS ROWS WITH UPDATED COLUMNS */
     function renderMeasurementTable() {
       const tbody = document.getElementById('measurement-table-body');
       const year = parseInt(document.getElementById('measurements-year-select').value);
@@ -1309,7 +1294,7 @@
             <td><input type="number" step="0.1" class="input-control meas-l-cal" value="${lCal}" placeholder="--" disabled style="width:70px;"></td>
             <td><input type="number" step="0.1" class="input-control meas-r-cal" value="${rCal}" placeholder="--" disabled style="width:70px;"></td>
             <td>
-              <button class="btn btn-secondary" id="meas-btn-${mIdx}" onclick="toggleEditMeasurement(${mIdx}, '${dateStr}', ${year})" style="padding: 6px 10px; font-size: 0.7rem;">
+              <button class="btn btn-secondary" id="meas-btn-${mIdx}" onclick="toggleEditMeasurement(${mIdx}, '${dateStr}', ${year})" style="padding: 4px 8px; font-size: 0.7rem;">
                 <i class="fa-solid fa-pen-to-square"></i> Edit
               </button>
             </td>
